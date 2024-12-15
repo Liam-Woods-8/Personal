@@ -30,7 +30,9 @@
       .countdown {
         text-align: center;
         font-size: 50px;
-        letter-spacing: 2px;
+        letter-spacing: 5px;
+        font-family: "CopyDuck", Courier, monospace;
+        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #00ff00;
       }
 
       .countdown span {
@@ -48,7 +50,8 @@
       }
 
       .skip-button,
-      .revert-button {
+      .revert-button,
+      .fireworks-button {
         background-color: white;
         color: black;
         border: none;
@@ -78,8 +81,17 @@
         padding: 10px 20px;
       }
 
+      .fireworks-button {
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+
       .skip-button:hover,
-      .revert-button:hover {
+      .revert-button:hover,
+      .fireworks-button:hover {
         background-color: #00ff00;
         color: black;
       }
@@ -97,15 +109,19 @@
 
     <button class="skip-button" id="skipButton">Skip to Message</button>
     <button class="revert-button" id="revertButton">Revert to Countdown</button>
+    <button class="fireworks-button" id="fireworksButton">
+      Trigger Fireworks
+    </button>
 
     <script>
       const targetDate = new Date("January 5, 2025 00:00:00").getTime();
       const skipButton = document.getElementById("skipButton");
       const revertButton = document.getElementById("revertButton");
+      const fireworksButton = document.getElementById("fireworksButton");
       const countdownElement = document.getElementById("countdown");
       const specialMessageElement = document.getElementById("specialMessage");
 
-      // Initialize Fireworks.js (at the bottom of the body to avoid page interference)
+      // Initialize Fireworks.js
       const fireworks = new Fireworks.default({
         particleCount: 150,
         speed: 5,
@@ -130,7 +146,7 @@
         if (timeRemaining <= 0) {
           countdownElement.style.display = "none";
           specialMessageElement.style.display = "block";
-          triggerFireworks(); // Trigger fireworks when countdown hits the target date
+          fireworksButton.style.display = "block"; // Show Fireworks button when countdown is over
         } else {
           const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
           const hours = Math.floor(
@@ -154,7 +170,7 @@
         specialMessageElement.style.display = "block";
         skipButton.style.display = "none";
         revertButton.style.display = "block";
-        triggerFireworks(); // Trigger fireworks when the user skips
+        fireworksButton.style.display = "block"; // Show Fireworks button when skipping
       });
 
       // Event listener for the Revert to Countdown button
@@ -163,7 +179,13 @@
         countdownElement.style.display = "block";
         skipButton.style.display = "block";
         revertButton.style.display = "none";
+        fireworksButton.style.display = "none"; // Hide Fireworks button when reverting back
         fireworks.stop(); // Stop fireworks when reverting back to countdown
+      });
+
+      // Event listener for the Fireworks button
+      fireworksButton.addEventListener("click", function () {
+        triggerFireworks(); // Trigger fireworks when clicked
       });
 
       // Update the countdown every second
