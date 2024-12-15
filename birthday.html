@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Countdown Timer</title>
+    <style>
+      @font-face {
+        font-family: "CopyDuck";
+        src: url("copyduck/copyduck.ttf") format("truetype"),
+          url("copyduck/copyduck.otf") format("opentype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      body {
+        background-color: black;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 100vh;
+        color: white;
+        font-family: "CopyDuck", Courier, monospace;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .countdown {
+        text-align: center;
+        font-size: 50px;
+        letter-spacing: 2px;
+      }
+
+      .countdown span {
+        color: #ffffff;
+        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #00ff00;
+      }
+
+      .message {
+        font-size: 30px;
+        color: #ffffff;
+        display: none;
+        margin-top: 20px;
+        text-align: center;
+        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #00ff00;
+      }
+
+      .skip-button,
+      .revert-button {
+        background-color: white;
+        color: black;
+        border: none;
+        padding: 8px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        position: absolute;
+        bottom: 30px;
+        font-family: "CopyDuck", Courier, monospace;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+        transition: background-color 0.3s;
+      }
+
+      .skip-button {
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .revert-button {
+        left: 50%;
+        transform: translateX(-50%);
+        display: none;
+        font-size: 14px;
+        padding: 10px 20px;
+      }
+
+      .skip-button:hover,
+      .revert-button:hover {
+        background-color: #00ff00;
+        color: black;
+      }
+    </style>
+    <!-- Include Fireworks.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.0.2/dist/index.min.js"></script>
+  </head>
+  <body>
+    <div class="countdown" id="countdown">
+      <span id="days"></span> days <span id="hours"></span> hours
+      <span id="minutes"></span> minutes <span id="seconds"></span> seconds
+    </div>
+
+    <div class="message" id="specialMessage">Happy January 5th, 2025!</div>
+
+    <button class="skip-button" id="skipButton">Skip to Message</button>
+    <button class="revert-button" id="revertButton">Revert to Countdown</button>
+
+    <script>
+      const targetDate = new Date("January 5, 2025 00:00:00").getTime();
+      const skipButton = document.getElementById("skipButton");
+      const revertButton = document.getElementById("revertButton");
+      const countdownElement = document.getElementById("countdown");
+      const specialMessageElement = document.getElementById("specialMessage");
+
+      // Initialize Fireworks.js
+      const fireworks = new Fireworks.default({
+        particleCount: 150,
+        speed: 5,
+        acceleration: 2,
+        rotation: 90,
+        friction: 0.95,
+        opacity: 0.8,
+        hue: { min: 0, max: 360 },
+        delay: 0,
+      });
+
+      // Function to trigger fireworks
+      function triggerFireworks() {
+        fireworks.start();
+      }
+
+      // Function to update the countdown every second
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const timeRemaining = targetDate - now;
+
+        if (timeRemaining <= 0) {
+          countdownElement.style.display = "none";
+          specialMessageElement.style.display = "block";
+          triggerFireworks(); // Trigger fireworks when countdown hits the target date
+        } else {
+          const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+          const hours = Math.floor(
+            (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+          );
+          const minutes = Math.floor(
+            (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
+          );
+          const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+          document.getElementById("days").textContent = days;
+          document.getElementById("hours").textContent = hours;
+          document.getElementById("minutes").textContent = minutes;
+          document.getElementById("seconds").textContent = seconds;
+        }
+      }
+
+      // Event listener for the Skip to Message button
+      skipButton.addEventListener("click", function () {
+        countdownElement.style.display = "none";
+        specialMessageElement.style.display = "block";
+        skipButton.style.display = "none";
+        revertButton.style.display = "block";
+        triggerFireworks(); // Trigger fireworks when the user skips
+      });
+
+      // Event listener for the Revert to Countdown button
+      revertButton.addEventListener("click", function () {
+        specialMessageElement.style.display = "none";
+        countdownElement.style.display = "block";
+        skipButton.style.display = "block";
+        revertButton.style.display = "none";
+        fireworks.stop(); // Stop fireworks when reverting back to countdown
+      });
+
+      // Update the countdown every second
+      setInterval(updateCountdown, 1000);
+    </script>
+  </body>
+</html>
