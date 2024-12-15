@@ -105,7 +105,7 @@
       const countdownElement = document.getElementById("countdown");
       const specialMessageElement = document.getElementById("specialMessage");
 
-      // Initialize Fireworks.js
+      // Initialize Fireworks.js (at the bottom of the body to avoid page interference)
       const fireworks = new Fireworks.default({
         particleCount: 150,
         speed: 5,
@@ -166,6 +166,7 @@
         fireworks.stop(); // Stop fireworks when reverting back to countdown
       });
 
+      // Update the countdown every second
       setInterval(updateCountdown, 1000);
     </script>
   </body>
