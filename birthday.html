@@ -1,91 +1,40 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Analog Countdown</title>
+    <title>Countdown Timer</title>
     <style>
-      #clock {
-        width: 300px;
-        height: 300px;
-        border-radius: 50%;
-        background-color: #fff;
-        border: 2px solid #000;
-        position: relative;
+      body {
+        background-color: black;
+        color: white;
+        text-align: center;
+        font-family: "Digital Display", monospace; /* Replace with your desired neon font */
+      }
+
+      #countdown {
+        font-size: 50px;
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
       }
 
       #fireworks-button {
-        position: absolute;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+        padding: 10px 20px;
         background-color: #007bff;
         color: #fff;
         border: none;
-        padding: 10px 20px;
         border-radius: 5px;
         cursor: pointer;
       }
     </style>
   </head>
   <body>
-    <canvas id="clock"></canvas>
+    <div id="countdown"></div>
     <button id="fireworks-button">Trigger Fireworks</button>
 
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.0.2/dist/index.min.js"></script>
     <script>
-      const canvas = document.getElementById("clock");
-      const ctx = canvas.getContext("2d");
-      const radius = canvas.width / 2;
       const targetDate = new Date("2025-01-05T00:00:00").getTime();
-
-      function drawClock() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-        ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
-        ctx.stroke();
-
-        // Draw numbers
-        ctx.font = "20px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        for (let i = 1; i <= 12; i++) {
-          const angle = (i * Math.PI) / 6;
-          const x = radius + radius * Math.sin(angle);
-          const y = radius - radius * Math.cos(angle);
-          ctx.fillText(i, x, y);
-        }
-
-        // Draw hands
-        const now = new Date().getTime();
-        const timeRemaining = targetDate - now;
-        const seconds = Math.floor(timeRemaining / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-
-        const hourAngle =
-          (hours % 12) * (Math.PI / 6) + (minutes / 720) * Math.PI;
-        const minuteAngle = (minutes % 60) * (Math.PI / 30);
-        const secondAngle = (seconds % 60) * (Math.PI / 30);
-
-        drawHand(ctx, radius, hourAngle, 0.5);
-        drawHand(ctx, radius, minuteAngle, 0.8);
-        drawHand(ctx, radius, secondAngle, 0.9, "red");
-      }
-
-      function drawHand(ctx, radius, angle, length, color) {
-        ctx.beginPath();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = color || "#000";
-        ctx.moveTo(radius, radius);
-        ctx.lineTo(
-          radius + length * radius * Math.cos(angle),
-          radius - length * radius * Math.sin(angle)
-        );
-        ctx.stroke();
-      }
-
-      setInterval(drawClock, 1000);
-
+      const countdownElement = document.getElementById("countdown");
       const fireworksButton = document.getElementById("fireworks-button");
+
       const fireworks = new Fireworks.default({
         particleCount: 150,
         speed: 5,
@@ -97,9 +46,27 @@
         delay: 0,
       });
 
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const timeRemaining = targetDate - now;
+
+        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const weeks = Math.floor(days / 7);
+        const remainingDays = days % 7;
+
+        countdownElement.textContent = `${weeks} weeks ${remainingDays} days`;
+
+        if (timeRemaining <= 0) {
+          countdownElement.textContent = "Happy New Year!";
+          fireworksButton.style.display = "block";
+        }
+      }
+
       fireworksButton.addEventListener("click", () => {
         fireworks.start();
       });
+
+      setInterval(updateCountdown, 1000);
     </script>
   </body>
 </html>
