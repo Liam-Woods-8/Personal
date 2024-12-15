@@ -78,7 +78,7 @@
       .fireworks-button {
         left: 50%;
         transform: translateX(-50%);
-        display: none;
+        /* Remove display: none; to always show the button */
         font-size: 14px;
         padding: 10px 20px;
       }
@@ -90,7 +90,6 @@
         color: black;
       }
     </style>
-    <!-- Include Fireworks.js from CDN -->
     <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.0.2/dist/index.min.js"></script>
   </head>
   <body>
@@ -140,7 +139,6 @@
         if (timeRemaining <= 0) {
           countdownElement.style.display = "none";
           specialMessageElement.style.display = "block";
-          fireworksButton.style.display = "block"; // Show Fireworks button when countdown is over
         } else {
           const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
           const hours = Math.floor(
@@ -164,7 +162,6 @@
         specialMessageElement.style.display = "block";
         skipButton.style.display = "none";
         revertButton.style.display = "block";
-        fireworksButton.style.display = "block"; // Show Fireworks button when skipping
       });
 
       // Event listener for the Revert to Countdown button
@@ -173,13 +170,12 @@
         countdownElement.style.display = "block";
         skipButton.style.display = "block";
         revertButton.style.display = "none";
-        fireworksButton.style.display = "none"; // Hide Fireworks button when reverting back
         fireworks.stop(); // Stop fireworks when reverting back to countdown
       });
 
       // Event listener for the Fireworks button
       fireworksButton.addEventListener("click", function () {
-        triggerFireworks(); // Trigger fireworks when clicked
+        triggerFireworks();
       });
 
       // Update the countdown every second
