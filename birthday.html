@@ -1,120 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Countdown Timer</title>
+    <title>Analog Countdown</title>
     <style>
-      @font-face {
-        font-family: "CopyDuck";
-        src: url("copyduck/copyduck.ttf") format("truetype"),
-          url("copyduck/copyduck.otf") format("opentype");
-        font-weight: normal;
-        font-style: normal;
-      }
-
-      body {
-        background-color: black;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        height: 100vh;
-        color: white;
-        font-family: "CopyDuck", Courier, monospace;
+      #clock {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background-color: #fff;
+        border: 2px solid #000;
         position: relative;
-        overflow: hidden;
       }
 
-      .countdown {
-        text-align: center;
-        font-size: 50px;
-        letter-spacing: 5px;
-        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #00ff00;
-      }
-
-      .message {
-        font-size: 30px;
-        color: #ffffff;
-        display: none;
-        margin-top: 20px;
-        text-align: center;
-        text-shadow: 0 0 20px #ffffff, 0 0 30px #ffffff, 0 0 40px #00ff00;
-      }
-
-      .skip-button,
-      .revert-button,
-      .fireworks-button {
-        background-color: white;
-        color: black;
-        border: none;
-        padding: 8px 16px;
-        font-size: 14px;
-        cursor: pointer;
+      #fireworks-button {
         position: absolute;
-        bottom: 30px;
-        font-family: "CopyDuck", Courier, monospace;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
         border-radius: 5px;
-        box-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
-        transition: background-color 0.3s;
-      }
-
-      .skip-button {
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-
-      .revert-button {
-        left: 50%;
-        transform: translateX(-50%);
-        display: none;
-        font-size: 14px;
-        padding: 10px 20px;
-      }
-
-      .fireworks-button {
-        left: 50%;
-        transform: translateX(-50%);
-        /* Remove display: none; to always show the button */
-        font-size: 14px;
-        padding: 10px 20px;
-      }
-
-      .skip-button:hover,
-      .revert-button:hover,
-      .fireworks-button:hover {
-        background-color: #00ff00;
-        color: black;
+        cursor: pointer;
       }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.0.2/dist/index.min.js"></script>
   </head>
   <body>
-    <div class="countdown" id="countdown">
-      <span id="days"></span> days <span id="hours"></span> hours
-      <span id="minutes"></span> minutes <span id="seconds"></span> seconds
-    </div>
+    <canvas id="clock"></canvas>
+    <button id="fireworks-button">Trigger Fireworks</button>
 
-    <div class="message" id="specialMessage">Happy January 5th, 2025!</div>
-
-    <button class="skip-button" id="skipButton">Skip to Message</button>
-    <button class="revert-button" id="revertButton">Revert to Countdown</button>
-    <button class="fireworks-button" id="fireworksButton">
-      Trigger Fireworks
-    </button>
-
+    <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.0.2/dist/index.min.js"></script>
     <script>
-      const targetDate = new Date("January 5, 2025 00:00:00").getTime();
-      const skipButton = document.getElementById("skipButton");
-      const revertButton = document.getElementById("revertButton");
-      const fireworksButton = document.getElementById("fireworksButton");
-      const countdownElement = document.getElementById("countdown");
-      const specialMessageElement = document.getElementById("specialMessage");
+      const canvas = document.getElementById("clock");
+      const ctx = canvas.getContext("2d");
+      const radius = canvas.width / 2;
+      const targetDate = new Date("2025-01-05T00:00:00").getTime();
 
-      // Initialize Fireworks.js
+      function drawClock() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.beginPath();
+        ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        // Draw numbers
+        ctx.font = "20px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        for (let i = 1; i <= 12; i++) {
+          const angle = (i * Math.PI) / 6;
+          const x = radius + radius * Math.sin(angle);
+          const y = radius - radius * Math.cos(angle);
+          ctx.fillText(i, x, y);
+        }
+
+        // Draw hands
+        const now = new Date().getTime();
+        const timeRemaining = targetDate - now;
+        const seconds = Math.floor(timeRemaining / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+
+        const hourAngle =
+          (hours % 12) * (Math.PI / 6) + (minutes / 720) * Math.PI;
+        const minuteAngle = (minutes % 60) * (Math.PI / 30);
+        const secondAngle = (seconds % 60) * (Math.PI / 30);
+
+        drawHand(ctx, radius, hourAngle, 0.5);
+        drawHand(ctx, radius, minuteAngle, 0.8);
+        drawHand(ctx, radius, secondAngle, 0.9, "red");
+      }
+
+      function drawHand(ctx, radius, angle, length, color) {
+        ctx.beginPath();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = color || "#000";
+        ctx.moveTo(radius, radius);
+        ctx.lineTo(
+          radius + length * radius * Math.cos(angle),
+          radius - length * radius * Math.sin(angle)
+        );
+        ctx.stroke();
+      }
+
+      setInterval(drawClock, 1000);
+
+      const fireworksButton = document.getElementById("fireworks-button");
       const fireworks = new Fireworks.default({
         particleCount: 150,
         speed: 5,
@@ -126,60 +97,9 @@
         delay: 0,
       });
 
-      // Function to trigger fireworks
-      function triggerFireworks() {
+      fireworksButton.addEventListener("click", () => {
         fireworks.start();
-      }
-
-      // Function to update the countdown every second
-      function updateCountdown() {
-        const now = new Date().getTime();
-        const timeRemaining = targetDate - now;
-
-        if (timeRemaining <= 0) {
-          countdownElement.style.display = "none";
-          specialMessageElement.style.display = "block";
-        } else {
-          const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-          const hours = Math.floor(
-            (timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-          );
-          const minutes = Math.floor(
-            (timeRemaining % (1000 * 60 * 60)) / (1000 * 60)
-          );
-          const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-          document.getElementById("days").textContent = days;
-          document.getElementById("hours").textContent = hours;
-          document.getElementById("minutes").textContent = minutes;
-          document.getElementById("seconds").textContent = seconds;
-        }
-      }
-
-      // Event listener for the Skip to Message button
-      skipButton.addEventListener("click", function () {
-        countdownElement.style.display = "none";
-        specialMessageElement.style.display = "block";
-        skipButton.style.display = "none";
-        revertButton.style.display = "block";
       });
-
-      // Event listener for the Revert to Countdown button
-      revertButton.addEventListener("click", function () {
-        specialMessageElement.style.display = "none";
-        countdownElement.style.display = "block";
-        skipButton.style.display = "block";
-        revertButton.style.display = "none";
-        fireworks.stop(); // Stop fireworks when reverting back to countdown
-      });
-
-      // Event listener for the Fireworks button
-      fireworksButton.addEventListener("click", function () {
-        triggerFireworks();
-      });
-
-      // Update the countdown every second
-      setInterval(updateCountdown, 1000);
     </script>
   </body>
 </html>
